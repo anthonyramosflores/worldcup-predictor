@@ -87,5 +87,7 @@ def get_avg_goals_conceded(team, date, df, n = 10):
 
 # apply the get_result function to each row of the dataframe to create a new 'result' column
 df['result'] = df.apply(get_result, axis=1)
+df['is_competitive'] =(df['tournament'] != 'Friendly').astype(int)
+df['is_home'] = (~df['neutral']).astype(int)
 
-print(get_avg_goals_conceded('Brazil', '2022-11-01', df))
+print(df[['neutral', 'is_home']].head(10))
