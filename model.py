@@ -1,13 +1,19 @@
 import pandas as pd
 
+# allows us to see all columns in the dataframe when printing
 pd.set_option('display.max_columns', None)
 
+# read in the data
 df = pd.read_csv('results.csv')
+
+# code commented out for now
 # print(df.head())
 
+# parsing dates and filtering for matches before 2022-01-01 to focus on historical data
 df['date'] = pd.to_datetime(df['date'])
 df[df['date'] < '2022-01-01'].head()
 
+# get_result determines the outcome of a match based on the home and away scores
 def get_result(row):
     if row['home_score'] > row['away_score']:
         return 'home_win'
@@ -16,6 +22,8 @@ def get_result(row):
     else:
         return 'draw'
     
+# get_team_result determines the result of a match for a specific team (win, loss, draw)
+# based on the overall match result
 def get_team_result(row, team):
     if row['home_team'] == team:
         if row['result'] == 'home_win':
@@ -34,6 +42,8 @@ def get_team_result(row, team):
     else:
         return None
     
+# get_win_percentage calculates the win percentage for a given team up to a certain date
+# based on the last n matches
 def get_win_percentage(team, date, df, n = 10):
     team_matches = df[
         ((df['home_team'] == team) | (df['away_team'] == team)) &
@@ -46,7 +56,12 @@ def get_win_percentage(team, date, df, n = 10):
     results = team_matches.apply(lambda row: get_team_result(row, team), axis=1)
     wins = (results == 'win').sum()
     return wins / len(team_matches)
-    
+
+# apply the get_result function to each row of the dataframe to create a new 'result' column
 df['result'] = df.apply(get_result, axis=1)
+
+# Code commented out for now
 # print(df[['home_team', 'away_team', 'home_score', 'away_score', 'result']].head())
-print(get_win_percentage('San Marino', '2022-01-01', df))
+
+# code commented out for now, used for testing
+# print(get_win_percentage('San Merino', '2022-01-01', df))
