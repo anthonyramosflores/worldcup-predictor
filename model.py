@@ -44,10 +44,10 @@ def get_team_result(row, team):
     
 # get_win_percentage calculates the win percentage for a given team up to a certain date
 # based on the last n matches
-def get_win_percentage(team, date, df, n = 10):
-    team_matches = df[
-        ((df['home_team'] == team) | (df['away_team'] == team)) &
-        (df['date'] < date)
+def get_win_percentage(team, date, data, n = 10):
+    team_matches = data[
+        ((data['home_team'] == team) | (data['away_team'] == team)) &
+        (data['date'] < date)
     ].tail(n)
 
     if len(team_matches) == 0:
@@ -58,7 +58,7 @@ def get_win_percentage(team, date, df, n = 10):
     return wins / len(team_matches)
 
 # get_avg_goals_scored calculates the average goals scored by a team in their last n matches before a given date
-def get_avg_goals_score(team, date, df, n = 10):
+def get_avg_goals_scored(team, date, df, n = 10):
     team_matches = df[
         ((df['home_team'] == team) | (df['away_team'] == team)) &
         (df['date'] < date)
@@ -85,9 +85,36 @@ def get_avg_goals_conceded(team, date, df, n = 10):
     results = team_matches.apply(lambda row: row['away_score'] if row['home_team'] == team else row['home_score'], axis = 1)
     return results.mean()
 
+# training row
+def build_training_row(row, df):
+    home_team = row['home_team']
+    away_team = row['away_team']
+    date = row['date']
+
+    return {
+        'home_win_pct': get_win_percentage(home_team, date, df),
+        'away_win_pct': get_win_percentage(away_team, date, df),
+        'home_goals_scored': get_avg_goals_scored(home_team, date, df),
+        'away_goals_scored': get_avg_goals_scored(away_team, date, df),
+        'home_goals_conceded': get_avg_goals_conceded(home_team, date, df),
+        'away_goals_conceded': get_avg_goals_conceded(away_team, date, df),
+        'is_competitive': row['is_competitive'],
+        'is_home': row['is_home'],
+        'result': row['result']
+    }
+
 # apply the get_result function to each row of the dataframe to create a new 'result' column
 df['result'] = df.apply(get_result, axis=1)
 df['is_competitive'] =(df['tournament'] != 'Friendly').astype(int)
 df['is_home'] = (~df['neutral']).astype(int)
 
-print(df[['neutral', 'is_home']].head(10))
+full_df = df.copy()
+df = df[df['tournament'].str.contains('FIFA World Cup')]
+print(len(df))
+
+#print(df[['neutral', 'is_home']].head(10))
+# sample_df = df.head(500)
+training_data = df.apply(lambda row: build_training_row(row, full_df), axis=1, result_type='expand')
+# print(training_data.head())
+print(training_data.head())
+print(len(training_data))
