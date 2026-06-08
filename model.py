@@ -57,6 +57,22 @@ def get_win_percentage(team, date, df, n = 10):
     wins = (results == 'win').sum()
     return wins / len(team_matches)
 
+# get_avg_goals_scored calculates the average goals scored by a team in their last n matches before a given date
+def get_avg_goals_score(team, date, df, n = 10):
+    team_matches = df[
+        ((df['home_team'] == team) | (df['away_team'] == team)) &
+        (df['date'] < date)
+    ].tail(n)
+
+    if len(team_matches) == 0:
+        return 0
+
+    # for each row, get the goals score by the team
+
+    results = team_matches.apply(lambda row: row['home_score'] if row['home_team'] == team else row['away_score'], axis=1)
+    return results.mean() 
+    
+
 # apply the get_result function to each row of the dataframe to create a new 'result' column
 df['result'] = df.apply(get_result, axis=1)
 
@@ -65,3 +81,5 @@ df['result'] = df.apply(get_result, axis=1)
 
 # code commented out for now, used for testing
 # print(get_win_percentage('San Merino', '2022-01-01', df))
+
+print(get_avg_goals_score('Brazil', '2022-11-01', df))
