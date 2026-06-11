@@ -1,4 +1,7 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 # allows us to see all columns in the dataframe when printing
 pd.set_option('display.max_columns', None)
@@ -110,11 +113,26 @@ df['is_home'] = (~df['neutral']).astype(int)
 
 full_df = df.copy()
 df = df[df['tournament'].str.contains('FIFA World Cup')]
-print(len(df))
+# print(len(df))
 
 #print(df[['neutral', 'is_home']].head(10))
 # sample_df = df.head(500)
-training_data = df.apply(lambda row: build_training_row(row, full_df), axis=1, result_type='expand')
-# print(training_data.head())
-print(training_data.head())
-print(len(training_data))
+# training_data = df.apply(lambda row: build_training_row(row, full_df), axis=1, result_type='expand')
+# training_data.to_csv('training_data.csv', index=False)
+training_data = pd.read_csv('training_data.csv')
+training_data['target'] = training_data['result'].map({'home_win': 0, 'draw': 1, 'away_win': 2})
+
+x = training_data.drop(columns=['result', 'target'])
+y = training_data['target']
+
+print(x.shape)
+print(y.value_counts())
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(x_train, y_train)
+
+y_pred = model.predict(x_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
