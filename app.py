@@ -7,7 +7,7 @@ import streamlit as st
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-st.title("World CUp Match Predictor")
+st.title("World Cup Match Predictor")
 
 results = pd.read_csv('results.csv')
 results['date'] = pd.to_datetime(results['date'])
