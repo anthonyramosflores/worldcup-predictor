@@ -145,3 +145,8 @@ rf_model.fit(x_train, y_train)
 rf_pred = rf_model.predict(x_test)
 rf_accuracy = accuracy_score(y_test, rf_pred)
 print(f"Random Forest Accuracy: {rf_accuracy:.2f}")
+
+import pickle
+
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
