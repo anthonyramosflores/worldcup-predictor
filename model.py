@@ -136,3 +136,12 @@ model.fit(x_train, y_train)
 y_pred = model.predict(x_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy: {accuracy:.2f}")
+
+from sklearn.ensemble import RandomForestClassifier
+
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(x_train, y_train)
+
+rf_pred = rf_model.predict(x_test)
+rf_accuracy = accuracy_score(y_test, rf_pred)
+print(f"Random Forest Accuracy: {rf_accuracy:.2f}")
